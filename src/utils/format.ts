@@ -4,9 +4,6 @@
  * 所有涉及数据展示格式化的函数集中在此文件，方便统一修改展示规则。
  */
 
-const DATE_FORMAT = 'YYYY-MM-DD';
-const DATETIME_FORMAT = 'YYYY-MM-DD HH:mm:ss';
-
 /**
  * 格式化日期
  * @example formatDate('2026-07-09T10:30:00') // => '2026-07-09'

@@ -1,4 +1,4 @@
-﻿import { describe, it, expect } from "vitest";
+import { describe, it, expect } from "vitest";
 import { validatePhone, validateEmail, validateAmount, validatePassword, validateIdCard } from "../validate";
 
 describe("validatePhone", () => {
@@ -27,7 +27,7 @@ describe("validateEmail", () => {
 });
 
 describe("validateAmount", () => {
-  it("空值通过", async () => { await expect(validateAmount(null, null)).resolves.toBeUndefined(); });
+  it("空值通过", async () => { await expect(validateAmount(null, null as unknown as number)).resolves.toBeUndefined(); });
   it("正整数通过", async () => { await expect(validateAmount(null, 100)).resolves.toBeUndefined(); });
   it("零通过", async () => { await expect(validateAmount(null, 0)).resolves.toBeUndefined(); });
   it("负数不过", async () => { await expect(validateAmount(null, -1)).rejects.toThrow(); });

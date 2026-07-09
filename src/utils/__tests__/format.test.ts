@@ -1,4 +1,4 @@
-﻿import { describe, it, expect } from "vitest";
+import { describe, it, expect } from "vitest";
 import { formatDate, formatDateTime, formatMoney, maskPhone, maskEmail, maskAccount } from "../format";
 
 describe("formatDate", () => {
@@ -10,7 +10,7 @@ describe("formatDate", () => {
   });
   it("空值返回占位符", () => {
     expect(formatDate("")).toBe("-");
-    expect(formatDate(null)).toBe("-");
+    expect(formatDate(null as unknown as string)).toBe("-");
   });
   it("无效日期返回占位符", () => {
     expect(formatDate("not-a-date")).toBe("-");
@@ -27,7 +27,7 @@ describe("formatDateTime", () => {
 describe("formatMoney", () => {
   it("分转元加符号", () => { expect(formatMoney(123456)).toBe("¥1,234.56"); });
   it("零分显示", () => { expect(formatMoney(0)).toBe("¥0.00"); });
-  it("null返回占位符", () => { expect(formatMoney(null)).toBe("-"); });
+  it("null返回占位符", () => { expect(formatMoney(null as unknown as number)).toBe("-"); });
   it("不显示符号", () => { expect(formatMoney(123456, false)).toBe("1,234.56"); });
 });
 

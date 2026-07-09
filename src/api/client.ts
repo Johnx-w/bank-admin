@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Axios 实例 — 全局唯一 HTTP 客户端
  *
  * 职责：
@@ -49,6 +49,37 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+/**
+ * 类型安全的 GET 请求封装
+ *
+ * Axios 响应拦截器在运行时解包 response.data，但 TS 无法推断此转换。
+ * 该封装确保返回值类型与运行时一致。
+ */
+export async function getApi<T>(url: string): Promise<T> {
+  const res = await api.get(url);
+  return res as unknown as T;
+}
+
+export async function postApi<T>(url: string, data?: unknown): Promise<T> {
+  const res = await api.post(url, data);
+  return res as unknown as T;
+}
+
+export async function putApi<T>(url: string, data?: unknown): Promise<T> {
+  const res = await api.put(url, data);
+  return res as unknown as T;
+}
+
+export async function patchApi<T>(url: string, data?: unknown): Promise<T> {
+  const res = await api.patch(url, data);
+  return res as unknown as T;
+}
+
+export async function deleteApi<T>(url: string): Promise<T> {
+  const res = await api.delete(url);
+  return res as unknown as T;
+}
 
 export { api };
 export default api;

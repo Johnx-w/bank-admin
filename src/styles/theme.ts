@@ -1,26 +1,27 @@
 /**
  * Ant Design 6 主题配置
- * 品牌色使用银行系蓝色，#1677ff 系 Ant Design 默认蓝，
- * 如需定制品牌色，修改 token.colorPrimary 即可
+ *
+ * 提供亮色和暗色两套主题，通过 appStore.theme 动态切换。
+ * 品牌色使用银行系蓝色 #1677ff。
  *
  * @see https://ant.design/docs/react/customize-theme
  */
-import type { ThemeConfig } from 'antd';
+import type { ThemeConfig } from "antd";
 
-/** 系统主题配置对象 */
+/** 亮色主题配置 */
 export const themeConfig: ThemeConfig = {
   token: {
-    colorPrimary: '#1677ff',           // 品牌主色
-    colorSuccess: '#52c41a',
-    colorWarning: '#faad14',
-    colorError: '#ff4d4f',
-    borderRadius: 6,                     // 统一圆角
+    colorPrimary: "#1677ff",
+    colorSuccess: "#52c41a",
+    colorWarning: "#faad14",
+    colorError: "#ff4d4f",
+    borderRadius: 6,
     fontSize: 14,
-    wireframe: false,                    // 使用填充风格而非线框
+    wireframe: false,
   },
   components: {
     Table: {
-      headerBg: '#fafafa',
+      headerBg: "#fafafa",
       headerBorderRadius: 6,
     },
     Menu: {
@@ -28,6 +29,28 @@ export const themeConfig: ThemeConfig = {
     },
     Card: {
       paddingLG: 20,
+    },
+  },
+};
+
+/** 暗色主题配置 */
+export const darkThemeConfig: ThemeConfig = {
+  algorithm: undefined, // will be overridden at runtime with theme.darkAlgorithm
+  token: {
+    colorPrimary: "#1677ff",
+    colorSuccess: "#52c41a",
+    colorWarning: "#faad14",
+    colorError: "#ff4d4f",
+    borderRadius: 6,
+    fontSize: 14,
+  },
+  components: {
+    Table: {
+      headerBg: "#1f1f1f",
+      headerBorderRadius: 6,
+    },
+    Menu: {
+      darkItemBg: "#141414",
     },
   },
 };
