@@ -6,7 +6,7 @@ describe("formatDate", () => {
     expect(formatDate("2026-07-09T10:30:00")).toBe("2026-07-09");
   });
   it("格式化 Date 对象", () => {
-    expect(formatDate(new Date(2026, 6, 9))).toBe("2026-07-09");
+    expect(formatDate(new Date('2026-07-09'))).toBe("2026-07-09");
   });
   it("空值返回占位符", () => {
     expect(formatDate("")).toBe("-");
