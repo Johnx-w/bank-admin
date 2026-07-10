@@ -1,0 +1,39 @@
+name: CI
+
+# 什么时候触发
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # 唯一一个 job：类型检查 + 测试 + 构建
+  test-and-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # ---- 第1步：拉代码 ----
+      - uses: actions/checkout@v4
+
+      # ---- 第2步：装 Node.js ----
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          # 缓存 npm 依赖，第二次跑快很多
+          cache: "npm"
+
+      # ---- 第3步：装依赖 ----
+      # npm ci 严格按 lock 文件装，CI 标准做法
+      - run: npm ci
+
+      # ---- 第4步：TypeScript 类型检查 ----
+      # 只做类型检查不生成文件，速度更快
+      - run: npx tsc --noEmit
+
+      # ---- 第5步：运行单元测试 ----
+      - run: npm test
+
+      # ---- 第6步：生产构建 ----
+      # 验证代码能成功打包
+      - run: npx vite build
