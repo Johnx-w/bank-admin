@@ -1,14 +1,14 @@
 name: CI
 
-# 什么时候触发
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
+    types: [opened]
 
 jobs:
-  # 唯一一个 job：类型检查 + 测试 + 构建
+  # 类型检查 + 测试 + 构建
   test-and-build:
     runs-on: ubuntu-latest
 
