@@ -21,14 +21,26 @@ export function AuthLayout({ children, title = "银行后台管理系统" }: Aut
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        position: "relative",
+        background: "url(/images/bg.jpg) center/cover no-repeat",
       }}
     >
+      {/* 半透明遮罩层 */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background: "rgba(0,0,0,0.45)",
+          pointerEvents: "none",
+        }}
+      />
       <Card
         style={{
           width: 420,
           borderRadius: 8,
           boxShadow: "0 4px 24px rgba(0,0,0,0.15)",
+          position: "relative",
+          zIndex: 1,
         }}
       >
         <div style={{ textAlign: "center", marginBottom: 32 }}>
