@@ -1,0 +1,21 @@
+# 依赖
+node_modules
+
+# 构建产物
+dist
+release
+
+# Git
+.git
+.gitignore
+
+# IDE
+.vscode
+.idea
+
+# 临时文件
+*.log
+.DS_Store
+
+# CI
+.github
