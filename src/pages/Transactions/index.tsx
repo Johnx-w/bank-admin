@@ -1,16 +1,31 @@
+﻿/**
+ * 交易管理页面
+ *
+ * 展示交易列表，支持多条件筛选、详情查看和审核操作（通过/驳回 + 二次确认）。
+ *
+ * 规则依据：
+ *   error-handling（异步操作 try-catch）
+ *   js-early-exit（error/loading 提前返回）
+ *   rendering-conditional-render（三元表达式）
+ *   rerender-memo（回调记忆化）
+ */
 import { useState, useEffect, useCallback } from "react";
-import { Card, Button, Input, Select, Space, Tag, Drawer, Descriptions, Spin, Typography } from "antd";
+import { Button, Space, Tag, Drawer, Descriptions, Spin, Typography, Select, Input } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import { SearchOutlined, ReloadOutlined, EyeOutlined } from "@ant-design/icons";
-import { getApi } from "../../api/client";
+import { ReloadOutlined, EyeOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import { ProTable } from "../../components/ProTable";
+import { SearchForm } from "../../components/SearchForm";
 import { PageLoading } from "../../components/PageLoading";
 import { PermissionBtn } from "../../components/PermissionBtn";
+import { confirmAction } from "../../components/ConfirmModal";
 import { usePagination } from "../../hooks/usePagination";
 import { formatDateTime, formatMoney } from "../../utils/format";
-import { TRANSACTION_STATUS_OPTIONS, TRANSACTION_DIRECTION_OPTIONS } from "../../utils/constants";
-import type { ApiResponse, PaginatedData } from "../../types/api";
+import {
+  TRANSACTION_STATUS_OPTIONS,
+  TRANSACTION_DIRECTION_OPTIONS,
+} from "../../utils/constants";
 import type { Transaction, TransactionStatus, TransactionDirection } from "../../types/transaction";
+import { fetchTransactionList, fetchTransactionById, auditTransactions } from "../../api/transactions";
 
 interface TransactionListRow {
   id: string;
@@ -24,76 +39,75 @@ interface TransactionListRow {
   createdAt: string;
 }
 
-/**
- * 交易管理页面
- *
- * 展示交易列表，支持按类型/状态/金额区间筛选，点击行查看详情。
- * 规则依据：
- *   error-handling（异步操作 try-catch）
- *   js-early-exit（error/loading 提前返回）
- *   rendering-conditional-render（三元表达式）
- */
 export default function TransactionsPage() {
   const [transactions, setTransactions] = useState<TransactionListRow[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [keyword, setKeyword] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("");
-  const [directionFilter, setDirectionFilter] = useState<string>("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [directionFilter, setDirectionFilter] = useState("");
   const [minAmount, setMinAmount] = useState("");
   const [maxAmount, setMaxAmount] = useState("");
   const pagination = usePagination();
 
-  // 详情抽屉状态
+  // 详情抽屉
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedTx, setSelectedTx] = useState<Transaction | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [detailError, setDetailError] = useState("");
 
+  // 选中行（用于批量审核）
+  const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
+
   /** 获取交易列表 */
-  const fetchTransactions = useCallback(async () => {
+  const loadTransactions = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
-      const params = new URLSearchParams();
-      params.set("page", String(pagination.page));
-      params.set("pageSize", String(pagination.pageSize));
-      if (statusFilter) params.set("status", statusFilter);
-      if (directionFilter) params.set("direction", directionFilter);
-      if (keyword) params.set("keyword", keyword);
-      if (minAmount) params.set("minAmount", minAmount);
-      if (maxAmount) params.set("maxAmount", maxAmount);
-
-      const body = await getApi<ApiResponse<PaginatedData<Transaction>>>("/transactions?" + params.toString()
-      );
-      setTransactions(body.data.list);
-      pagination.setTotal(body.data.total);
+      const res = await fetchTransactionList({
+        page: pagination.page,
+        pageSize: pagination.pageSize,
+        status: statusFilter || undefined,
+        direction: directionFilter || undefined,
+        keyword: keyword || undefined,
+        minAmount: minAmount || undefined,
+        maxAmount: maxAmount || undefined,
+      });
+      setTransactions(res.data.list);
+      pagination.setTotal(res.data.total);
     } catch {
       setError("数据加载失败，请检查网络连接后重试");
     } finally {
       setLoading(false);
     }
-  }, [pagination.page, pagination.pageSize, statusFilter, directionFilter, keyword, minAmount, maxAmount]);
+  }, [
+    pagination.page,
+    pagination.pageSize,
+    statusFilter,
+    directionFilter,
+    keyword,
+    minAmount,
+    maxAmount,
+  ]);
 
   useEffect(() => {
-    fetchTransactions();
-  }, [fetchTransactions]);
+    loadTransactions();
+  }, [loadTransactions]);
 
-  /** 搜索 */
   const handleSearch = useCallback((value: string) => {
     pagination.setPage(1);
     setKeyword(value);
   }, []);
 
-  /** 打开详情抽屉 */
+  /** 查看详情 */
   const handleViewDetail = useCallback(async (tx: TransactionListRow) => {
     setDrawerOpen(true);
     setSelectedTx(null);
     setDetailLoading(true);
     setDetailError("");
     try {
-      const detailBody = await getApi<ApiResponse<Transaction>>("/transactions/" + tx.id);
-      setSelectedTx(detailBody.data);
+      const res = await fetchTransactionById(tx.id);
+      setSelectedTx(res.data);
     } catch {
       setDetailError("加载详情失败，请重试");
     } finally {
@@ -101,17 +115,70 @@ export default function TransactionsPage() {
     }
   }, []);
 
+  /** 审核通过 */
+  const handleApprove = useCallback(
+    (tx: TransactionListRow) => {
+      confirmAction({
+        title: "确认审核通过？",
+        content: "审核通过后交易即刻生效，" + tx.transactionNo + " 将标记为已通过。",
+        type: "warning",
+        okText: "确认通过",
+        onOk: async () => {
+          await auditTransactions({
+            transactionIds: [tx.id],
+            action: "approve",
+            remark: "",
+          });
+          loadTransactions();
+          setDrawerOpen(false);
+        },
+      });
+    },
+    [loadTransactions]
+  );
+
+  /** 审核驳回 */
+  const handleReject = useCallback(
+    (tx: TransactionListRow) => {
+      confirmAction({
+        title: "确认驳回该交易？",
+        content: "驳回后 " + tx.transactionNo + " 将被标记为已驳回状态，不可恢复。",
+        type: "error",
+        okText: "确认驳回",
+        onOk: async () => {
+          await auditTransactions({
+            transactionIds: [tx.id],
+            action: "reject",
+            remark: "审核驳回",
+          });
+          loadTransactions();
+          setDrawerOpen(false);
+        },
+      });
+    },
+    [loadTransactions]
+  );
+
   /** 表格列定义 */
   const columns: ColumnsType<TransactionListRow> = [
-    { title: "流水号", dataIndex: "transactionNo", key: "transactionNo", width: 180 },
+    {
+      title: "流水号",
+      dataIndex: "transactionNo",
+      key: "transactionNo",
+      width: 190,
+    },
     {
       title: "金额",
       dataIndex: "amount",
       key: "amount",
-      width: 130,
+      width: 140,
       render: (_: unknown, record: TransactionListRow) => {
         const color = record.direction === "income" ? "#52c41a" : "#ff4d4f";
-        return <span style={{ color, fontWeight: 500 }}>{formatMoney(record.amount)}</span>;
+        return (
+          <span style={{ color, fontWeight: 500 }}>
+            {formatMoney(record.amount)}
+          </span>
+        );
       },
     },
     {
@@ -129,29 +196,41 @@ export default function TransactionsPage() {
       title: "状态",
       dataIndex: "status",
       key: "status",
-      width: 100,
+      width: 90,
       render: (_: unknown, record: TransactionListRow) => {
         const opt = TRANSACTION_STATUS_OPTIONS.find((o) => o.value === record.status);
         return <Tag color={opt?.color}>{opt?.label}</Tag>;
       },
     },
-    { title: "对方账户", dataIndex: "counterparty", key: "counterparty", width: 150 },
+    { title: "对方账户", dataIndex: "counterparty", key: "counterparty", width: 150, ellipsis: true },
     {
       title: "创建时间",
       dataIndex: "createdAt",
       key: "createdAt",
-      width: 160,
+      width: 170,
       render: (_: unknown, record: TransactionListRow) => formatDateTime(record.createdAt),
     },
     {
       title: "操作",
       key: "actions",
-      width: 100,
+      width: 200,
       fixed: "right",
       render: (_: unknown, record: TransactionListRow) => (
-        <PermissionBtn permCode="transaction:list" type="link" size="small" icon={<EyeOutlined />} onClick={() => handleViewDetail(record)}>
-          详情
-        </PermissionBtn>
+        <Space size="small">
+          <PermissionBtn permCode="transaction:list" type="link" size="small" icon={<EyeOutlined />} onClick={() => handleViewDetail(record)}>
+            详情
+          </PermissionBtn>
+          {record.status === "pending" ? (
+            <>
+              <PermissionBtn permCode="transaction:approve" type="link" size="small" icon={<CheckOutlined />} style={{ color: "#52c41a" }} onClick={() => handleApprove(record)}>
+                通过
+              </PermissionBtn>
+              <PermissionBtn permCode="transaction:approve" type="link" size="small" danger icon={<CloseOutlined />} onClick={() => handleReject(record)}>
+                驳回
+              </PermissionBtn>
+            </>
+          ) : null}
+        </Space>
       ),
     },
   ];
@@ -161,10 +240,13 @@ export default function TransactionsPage() {
     return (
       <div>
         <h2 style={{ marginBottom: 16 }}>交易管理</h2>
-        <Card>
-          <p style={{ color: "#ff4d4f" }}>{error}</p>
-          <Button onClick={fetchTransactions} style={{ marginTop: 8 }}>重试</Button>
-        </Card>
+        <div style={{ padding: 48, textAlign: "center" }}>
+          <Typography.Text type="danger">{error}</Typography.Text>
+          <br />
+          <Button onClick={loadTransactions} style={{ marginTop: 12 }}>
+            重试
+          </Button>
+        </div>
       </div>
     );
   }
@@ -174,48 +256,63 @@ export default function TransactionsPage() {
       <h2 style={{ marginBottom: 16 }}>交易管理</h2>
 
       {/* 搜索筛选栏 */}
-      <Card style={{ marginBottom: 16 }} styles={{ body: { padding: "12px 16px" } }}>
-        <Space wrap>
-          <Input.Search
-            placeholder="搜索流水号/对方账户/描述"
-            allowClear
-            style={{ width: 260 }}
-            prefix={<SearchOutlined />}
-            onSearch={handleSearch}
-          />
-          <Select
-            placeholder="交易状态"
-            allowClear
-            style={{ width: 120 }}
-            value={statusFilter || undefined}
-            onChange={(val) => { pagination.setPage(1); setStatusFilter(val || ""); }}
-            options={TRANSACTION_STATUS_OPTIONS.map((o) => ({ label: o.label, value: o.value }))}
-          />
-          <Select
-            placeholder="交易方向"
-            allowClear
-            style={{ width: 120 }}
-            value={directionFilter || undefined}
-            onChange={(val) => { pagination.setPage(1); setDirectionFilter(val || ""); }}
-            options={TRANSACTION_DIRECTION_OPTIONS.map((o) => ({ label: o.label, value: o.value }))}
-          />
-          <Input
-            placeholder="最低金额(分)"
-            style={{ width: 130 }}
-            value={minAmount}
-            onChange={(e) => setMinAmount(e.target.value)}
-          />
-          <Input
-            placeholder="最高金额(分)"
-            style={{ width: 130 }}
-            value={maxAmount}
-            onChange={(e) => setMaxAmount(e.target.value)}
-          />
-          <Button icon={<ReloadOutlined />} onClick={fetchTransactions} loading={loading}>
-            刷新
-          </Button>
-        </Space>
-      </Card>
+      <SearchForm
+        items={[
+          {
+            type: "keyword",
+            placeholder: "搜索流水号/对方账户",
+            width: 220,
+            onSearch: handleSearch,
+          },
+          {
+            type: "select",
+            placeholder: "交易状态",
+            width: 120,
+            value: statusFilter,
+            onChange: (val: string) => {
+              pagination.setPage(1);
+              setStatusFilter(val);
+            },
+            options: TRANSACTION_STATUS_OPTIONS.map((o) => ({
+              label: o.label,
+              value: o.value,
+            })),
+          },
+          {
+            type: "select",
+            placeholder: "交易方向",
+            width: 110,
+            value: directionFilter,
+            onChange: (val: string) => {
+              pagination.setPage(1);
+              setDirectionFilter(val);
+            },
+            options: TRANSACTION_DIRECTION_OPTIONS.map((o) => ({
+              label: o.label,
+              value: o.value,
+            })),
+          },
+        ]}
+        extra={
+          <Space>
+            <Input
+              placeholder="最低金额"
+              style={{ width: 110 }}
+              value={minAmount}
+              onChange={(e) => setMinAmount(e.target.value)}
+            />
+            <Input
+              placeholder="最高金额"
+              style={{ width: 110 }}
+              value={maxAmount}
+              onChange={(e) => setMaxAmount(e.target.value)}
+            />
+            <Button icon={<ReloadOutlined />} onClick={loadTransactions} loading={loading}>
+              刷新
+            </Button>
+          </Space>
+        }
+      />
 
       {/* 表格 */}
       {loading && transactions.length === 0 ? (
@@ -235,7 +332,11 @@ export default function TransactionsPage() {
             showSizeChanger: true,
             showTotal: (total: number) => "共 " + total + " 条",
           }}
-          scroll={{ x: 1100 }}
+          scroll={{ x: 1200 }}
+          onRow={(record: TransactionListRow) => ({
+            style: { cursor: "pointer" },
+            onClick: () => handleViewDetail(record),
+          })}
         />
       )}
 
@@ -243,8 +344,34 @@ export default function TransactionsPage() {
       <Drawer
         title="交易详情"
         open={drawerOpen}
-        onClose={() => { setDrawerOpen(false); setSelectedTx(null); setDetailError(""); }}
+        onClose={() => {
+          setDrawerOpen(false);
+          setSelectedTx(null);
+          setDetailError("");
+        }}
         width={520}
+        extra={
+          selectedTx && selectedTx.status === "pending" ? (
+            <Space>
+              <PermissionBtn
+                permCode="transaction:approve"
+                type="primary"
+                icon={<CheckOutlined />}
+                onClick={() => handleApprove(selectedTx as unknown as TransactionListRow)}
+              >
+                审核通过
+              </PermissionBtn>
+              <PermissionBtn
+                permCode="transaction:approve"
+                danger
+                icon={<CloseOutlined />}
+                onClick={() => handleReject(selectedTx as unknown as TransactionListRow)}
+              >
+                驳回
+              </PermissionBtn>
+            </Space>
+          ) : undefined
+        }
       >
         {detailLoading ? (
           <div style={{ display: "flex", justifyContent: "center", padding: 80 }}>
@@ -254,24 +381,52 @@ export default function TransactionsPage() {
           <div>
             <Typography.Text type="danger">{detailError}</Typography.Text>
             <br />
-            <Button onClick={() => handleViewDetail({ id: selectedTx?.id || "" } as TransactionListRow)} style={{ marginTop: 8 }}>重试</Button>
+            <Button
+              onClick={() =>
+                handleViewDetail({ id: selectedTx?.id || "" } as TransactionListRow)
+              }
+              style={{ marginTop: 8 }}
+            >
+              重试
+            </Button>
           </div>
         ) : selectedTx ? (
           <Descriptions column={1} bordered size="small" labelStyle={{ width: 100 }}>
             <Descriptions.Item label="流水号">{selectedTx.transactionNo}</Descriptions.Item>
             <Descriptions.Item label="金额">
-              <span style={{ fontWeight: 600, color: selectedTx.direction === "income" ? "#52c41a" : "#ff4d4f" }}>
+              <span
+                style={{
+                  fontWeight: 600,
+                  color: selectedTx.direction === "income" ? "#52c41a" : "#ff4d4f",
+                }}
+              >
                 {formatMoney(selectedTx.amount)}
               </span>
             </Descriptions.Item>
             <Descriptions.Item label="方向">
-              <Tag color={TRANSACTION_DIRECTION_OPTIONS.find((o) => o.value === selectedTx.direction)?.color}>
-                {TRANSACTION_DIRECTION_OPTIONS.find((o) => o.value === selectedTx.direction)?.label}
+              <Tag
+                color={
+                  TRANSACTION_DIRECTION_OPTIONS.find((o) => o.value === selectedTx.direction)
+                    ?.color
+                }
+              >
+                {
+                  TRANSACTION_DIRECTION_OPTIONS.find((o) => o.value === selectedTx.direction)
+                    ?.label
+                }
               </Tag>
             </Descriptions.Item>
             <Descriptions.Item label="状态">
-              <Tag color={TRANSACTION_STATUS_OPTIONS.find((o) => o.value === selectedTx.status)?.color}>
-                {TRANSACTION_STATUS_OPTIONS.find((o) => o.value === selectedTx.status)?.label}
+              <Tag
+                color={
+                  TRANSACTION_STATUS_OPTIONS.find((o) => o.value === selectedTx.status)
+                    ?.color
+                }
+              >
+                {
+                  TRANSACTION_STATUS_OPTIONS.find((o) => o.value === selectedTx.status)
+                    ?.label
+                }
               </Tag>
             </Descriptions.Item>
             <Descriptions.Item label="分类">{selectedTx.category}</Descriptions.Item>
@@ -284,9 +439,13 @@ export default function TransactionsPage() {
             {selectedTx.auditRemark ? (
               <Descriptions.Item label="审核备注">{selectedTx.auditRemark}</Descriptions.Item>
             ) : null}
-            <Descriptions.Item label="创建时间">{formatDateTime(selectedTx.createdAt)}</Descriptions.Item>
+            <Descriptions.Item label="创建时间">
+              {formatDateTime(selectedTx.createdAt)}
+            </Descriptions.Item>
             {selectedTx.auditedAt ? (
-              <Descriptions.Item label="审核时间">{formatDateTime(selectedTx.auditedAt)}</Descriptions.Item>
+              <Descriptions.Item label="审核时间">
+                {formatDateTime(selectedTx.auditedAt)}
+              </Descriptions.Item>
             ) : null}
           </Descriptions>
         ) : (

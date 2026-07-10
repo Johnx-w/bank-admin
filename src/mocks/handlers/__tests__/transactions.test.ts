@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 交易 Mock Handler 单元测试
  *
  * 验证 mock 数据完整性和 handler 导出。
@@ -48,7 +48,14 @@ describe("MOCK_TRANSACTIONS", () => {
 });
 
 describe("transactionHandlers", () => {
-  it("导出两个 handler（列表 + 详情）", () => {
-    expect(transactionHandlers).toHaveLength(2);
+  it("导出 3 个 handler（列表 + 详情 + 审核）", () => {
+    expect(transactionHandlers).toHaveLength(3);
+  });
+
+  it("包含审核路由", () => {
+    const auditHandler = transactionHandlers.find(
+      (h) => h.info.method === "PATCH"
+    );
+    expect(auditHandler).toBeDefined();
   });
 });

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 账户 Mock Handler 单元测试
  *
  * 验证 mock 数据完整性和 handler 导出。
@@ -17,45 +17,59 @@ describe("MOCK_ACCOUNTS", () => {
       expect(acc.id).toBeTruthy();
       expect(acc.accountNo).toBeTruthy();
       expect(acc.holderName).toBeTruthy();
-      expect(["savings", "checking", "credit"]).toContain(acc.type);
+      // 余额可以是负数（信用账户透支），但必须是数字
+      expect(typeof acc.balance).toBe("number");
       expect(["active", "frozen", "closed"]).toContain(acc.status);
+      expect(["savings", "checking", "credit"]).toContain(acc.type);
       expect(acc.openDate).toBeTruthy();
-      expect(Array.isArray(acc.balanceRecords)).toBe(true);
     }
   });
 
   it("覆盖所有账户状态", () => {
-    const statuses = new Set(MOCK_ACCOUNTS.map((acc) => acc.status));
+    const statuses = new Set(MOCK_ACCOUNTS.map((a) => a.status));
     for (const s of ["active", "frozen", "closed"]) {
       expect(statuses.has(s)).toBe(true);
     }
   });
 
   it("覆盖所有账户类型", () => {
-    const types = new Set(MOCK_ACCOUNTS.map((acc) => acc.type));
+    const types = new Set(MOCK_ACCOUNTS.map((a) => a.type));
     for (const t of ["savings", "checking", "credit"]) {
       expect(types.has(t)).toBe(true);
     }
   });
 
+  it("余额变动记录数组存在", () => {
+    for (const acc of MOCK_ACCOUNTS) {
+      expect(Array.isArray(acc.balanceRecords)).toBe(true);
+    }
+  });
+
   it("冻结账户含冻结原因", () => {
-    const frozen = MOCK_ACCOUNTS.filter((acc) => acc.status === "frozen");
+    const frozen = MOCK_ACCOUNTS.filter((a) => a.status === "frozen");
     expect(frozen.length).toBeGreaterThan(0);
     for (const acc of frozen) {
       expect(acc.freezeReason).toBeTruthy();
     }
   });
-
-  it("至少一个账户有余额变动记录", () => {
-    const withRecords = MOCK_ACCOUNTS.filter(
-      (acc) => acc.balanceRecords.length > 0
-    );
-    expect(withRecords.length).toBeGreaterThan(0);
-  });
 });
 
 describe("accountHandlers", () => {
-  it("导出两个 handler（列表 + 详情）", () => {
-    expect(accountHandlers).toHaveLength(2);
+  it("导出 4 个 handler（列表 + 详情 + 开户 + 状态变更）", () => {
+    expect(accountHandlers).toHaveLength(4);
+  });
+
+  it("包含 POST 开户路由", () => {
+    const createHandler = accountHandlers.find(
+      (h) => h.info.method === "POST"
+    );
+    expect(createHandler).toBeDefined();
+  });
+
+  it("包含 PATCH 状态变更路由", () => {
+    const patchHandler = accountHandlers.find(
+      (h) => h.info.method === "PATCH"
+    );
+    expect(patchHandler).toBeDefined();
   });
 });

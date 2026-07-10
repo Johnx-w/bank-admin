@@ -1,9 +1,9 @@
 ﻿/**
  * 交易管理 API 函数
  *
- * 交易数据为只读，仅提供列表查询和详情查询。
+ * 提供交易列表查询、详情查询和审核操作（通过/驳回）。
  */
-import { getApi } from "./client";
+import { getApi, patchApi } from "./client";
 import type { ApiResponse, PaginatedData } from "../types/api";
 import type { Transaction } from "../types/transaction";
 
@@ -16,6 +16,13 @@ export interface TransactionListParams {
   keyword?: string;
   minAmount?: string;
   maxAmount?: string;
+}
+
+/** 审核操作参数 */
+export interface AuditParams {
+  transactionIds: string[];
+  action: "approve" | "reject";
+  remark: string;
 }
 
 /** 获取交易分页列表 */
@@ -40,4 +47,14 @@ export async function fetchTransactionById(
   id: string
 ): Promise<ApiResponse<Transaction>> {
   return getApi<ApiResponse<Transaction>>("/transactions/" + id);
+}
+
+/** 审核交易（通过/驳回） */
+export async function auditTransactions(
+  params: AuditParams
+): Promise<ApiResponse<Transaction[]>> {
+  return patchApi<ApiResponse<Transaction[]>>(
+    "/transactions/audit",
+    params
+  );
 }

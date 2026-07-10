@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+﻿import type { ReactNode } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { AdminLayout } from "./layouts/AdminLayout";
 import { AuthLayout } from "./layouts/AuthLayout";
@@ -7,6 +7,11 @@ import DashboardPage from "./pages/Dashboard";
 import UsersPage from "./pages/Users";
 import TransactionsPage from "./pages/Transactions";
 import AccountsPage from "./pages/Accounts";
+import RolesPage from "./pages/Roles";
+import LogsPage from "./pages/Settings/LogsPage";
+import ConfigPage from "./pages/Settings/ConfigPage";
+import ProfilePage from "./pages/Profile";
+import ReportsPage from "./pages/Reports";
 import NotFoundPage from "./pages/NotFound";
 import { useAuthStore } from "./stores/authStore";
 
@@ -49,26 +54,17 @@ export default function AppRouter() {
       >
         <Route path="/" element={<DashboardPage />} />
         <Route path="/users" element={<UsersPage />} />
-        <Route path="/roles" element={<PlaceholderPage title="角色权限" />} />
+        <Route path="/roles" element={<RolesPage />} />
         <Route path="/transactions" element={<TransactionsPage />} />
         <Route path="/accounts" element={<AccountsPage />} />
-        <Route path="/settings/logs" element={<PlaceholderPage title="操作日志" />} />
-        <Route path="/settings/config" element={<PlaceholderPage title="系统配置" />} />
-        <Route path="/reports" element={<PlaceholderPage title="报表中心" />} />
-        <Route path="/profile" element={<PlaceholderPage title="个人中心" />} />
+        <Route path="/settings/logs" element={<LogsPage />} />
+        <Route path="/settings/config" element={<ConfigPage />} />
+        <Route path="/reports" element={<ReportsPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
       </Route>
 
       {/* 404 */}
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
-  );
-}
-
-/** 占位页面（功能未实现时显示） */
-function PlaceholderPage({ title }: { title: string }) {
-  return (
-    <div style={{ padding: 48, textAlign: "center", fontSize: 18 }}>
-      {title} — 开发中
-    </div>
   );
 }
