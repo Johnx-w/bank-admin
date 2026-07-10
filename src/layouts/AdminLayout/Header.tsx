@@ -1,4 +1,4 @@
-import { Layout, Button, Dropdown, Typography, Space } from "antd";
+import { Layout, Button, Dropdown, Typography, Space, theme as antdTheme } from "antd";
 import type { MenuProps } from "antd";
 import {
   MenuFoldOutlined,
@@ -18,6 +18,7 @@ import { useAuthStore } from "../../stores/authStore";
 import { useAuth } from "../../hooks/useAuth";
 
 const { Header: AntHeader } = Layout;
+const { useToken } = antdTheme;
 
 /** 路径到中文标题的映射 */
 const PATH_TITLE: Record<string, string> = {
@@ -42,9 +43,11 @@ interface HeaderProps {
  *
  * 包含侧边栏折叠按钮、页面标题、主题切换、全屏切换、用户下拉菜单。
  * 移动端（<768px）时显示汉堡按钮用于打开侧边抽屉。
+ * 背景色通过 useToken 获取当前主题 token，亮/暗色自适应。
  */
 export function Header({ onMobileMenuToggle }: HeaderProps) {
   const location = useLocation();
+  const { token } = useToken();
   const sidebarCollapsed = useAppStore((s) => s.sidebarCollapsed);
   const toggleSidebar = useAppStore((s) => s.toggleSidebar);
   const theme = useAppStore((s) => s.theme);
@@ -73,7 +76,12 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
     items: [
       { key: "profile", icon: <UserOutlined />, label: "个人中心" },
       { type: "divider" },
-      { key: "logout", icon: <LogoutOutlined />, label: "退出登录", danger: true },
+      {
+        key: "logout",
+        icon: <LogoutOutlined />,
+        label: "退出登录",
+        danger: true,
+      },
     ],
     onClick: ({ key }) => {
       if (key === "logout") logout();
@@ -87,8 +95,8 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        background: "#fff",
-        borderBottom: "1px solid #f0f0f0",
+        background: token.colorBgContainer,
+        borderBottom: "1px solid " + token.colorBorderSecondary,
       }}
       className="admin-header"
     >
@@ -97,7 +105,9 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
         <Button
           type="text"
           className="header-collapse-btn"
-          icon={sidebarCollapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+          icon={
+            sidebarCollapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />
+          }
           onClick={toggleSidebar}
         />
         {/* 移动端汉堡按钮 */}
@@ -119,11 +129,13 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
           type="text"
           icon={theme === "light" ? <MoonOutlined /> : <SunOutlined />}
           onClick={handleThemeToggle}
-          title={theme === "light" ? "切换暗色主题" : "切换亮色主题"}
+          title={theme === "light" ? "切换到暗色主题" : "切换到亮色主题"}
         />
         <Button
           type="text"
-          icon={isFullscreen ? <FullscreenExitOutlined /> : <FullscreenOutlined />}
+          icon={
+            isFullscreen ? <FullscreenExitOutlined /> : <FullscreenOutlined />
+          }
           onClick={toggleFullscreen}
         />
         <Dropdown menu={userMenu} placement="bottomRight">

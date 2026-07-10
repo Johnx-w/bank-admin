@@ -1,4 +1,4 @@
-﻿import type { ReactNode } from "react";
+import type { ReactNode } from "react";
 import { Button, Tooltip } from "antd";
 import type { ButtonProps } from "antd/es/button";
 import { usePermissionStore } from "../../stores/permissionStore";

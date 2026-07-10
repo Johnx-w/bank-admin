@@ -1,4 +1,4 @@
-﻿/**
+/**
  * 表单校验规则
  *
  * 配合 Ant Design Form 的 rules 使用。

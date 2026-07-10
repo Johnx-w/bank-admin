@@ -1,6 +1,9 @@
 /* ============================================================
  * 全局样式 — Bank Admin System
- * CSS Reset + 响应式断点 + 暗色主题适配
+ *
+ * 为 Ant Design 6 ConfigProvider theme.algorithm 提供补充样式。
+ * 暗色主题颜色由 Ant Design CSS 变量自动处理，
+ * 这里仅处理 Ant Design 未覆盖的布局/结构样式。
  * ============================================================ */
 
 *, *::before, *::after {
@@ -16,9 +19,11 @@ html, body {
   -webkit-font-smoothing: antialiased;
 }
 
-#root { height: 100%; }
+#root {
+  height: 100%;
+}
 
-/* ---- Layout ---- */
+/* ---- Layout 结构 ---- */
 .layout-content {
   margin: 16px;
   min-height: calc(100vh - 64px - 32px);
@@ -31,14 +36,7 @@ html, body {
   margin-bottom: 16px;
 }
 
-.dashboard-loading {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 400px;
-}
-
-/* ---- Logo ---- */
+/* ---- Logo 区域 ---- */
 .layout-logo {
   height: 64px;
   display: flex;
@@ -50,43 +48,75 @@ html, body {
 .layout-logo-text {
   color: #fff;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* ---- Desktop/Mobile toggle ---- */
-.header-collapse-btn { display: inline-flex; }
-.header-mobile-btn { display: none; }
-
-/* ---- 响应式断点 ---- */
-@media screen and (max-width: 767px) {
-  .layout-content {
-    margin: 8px;
-  }
-
-  .header-collapse-btn { display: none; }
-  .header-mobile-btn { display: inline-flex; }
-
-  .layout-sider { display: none; }
-
-  /* 移动端顶栏搜索区改为纵向 */
-  .ant-card-body .ant-space {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .ant-card-body .ant-space .ant-input-search,
-  .ant-card-body .ant-space .ant-select,
-  .ant-card-body .ant-space .ant-input {
-    width: 100% !important;
-  }
-
-  /* TabsView 在移动端减小字号 */
-  .ant-tabs-tab { font-size: 12px; }
+/* ---- Header ---- */
+.header-collapse-btn {
+  display: inline-flex;
 }
 
-/* ---- 暗色主题适配 ---- */
-[data-theme="dark"] .layout-logo {
+.header-mobile-btn {
+  display: none;
+}
+
+/* ---- 暗色模式下侧边栏 Logo 边框更淡 ---- */
+/* 暗色主题由 antd css-var 自动处理，此处仅调整透明度 */
+[data-css-var-theme="dark"] .layout-logo {
   border-bottom-color: rgba(255, 255, 255, 0.05);
 }
 
-/* 全局暗色模式下强制 Ant Design 应用暗色算法 */
-/* Ant Design 6 ConfigProvider theme.algorithm 自动处理大部分颜色 */
+/* ============================================================
+ * 响应式适配
+ * ============================================================ */
+
+@media screen and (max-width: 767px) {
+  /* 内容区间距缩小 */
+  .layout-content {
+    margin: 8px;
+    min-height: calc(100vh - 64px - 16px);
+  }
+
+  /* 隐藏桌面折叠按钮，显示移动端汉堡按钮 */
+  .header-collapse-btn {
+    display: none;
+  }
+
+  .header-mobile-btn {
+    display: inline-flex;
+  }
+
+  /* 桌面端侧边栏在移动端隐藏（改用 Drawer） */
+  .layout-sider {
+    display: none;
+  }
+
+  /* 搜索筛选栏在移动端纵向排列 */
+  .ant-card-body > .ant-space {
+    flex-direction: column;
+    align-items: stretch !important;
+  }
+
+  .ant-card-body > .ant-space > .ant-space-item {
+    width: 100%;
+  }
+
+  .ant-card-body .ant-input-search,
+  .ant-card-body .ant-select,
+  .ant-card-body .ant-input {
+    width: 100% !important;
+  }
+
+  /* TabsView 减小字号 */
+  .ant-tabs-tab {
+    font-size: 12px;
+  }
+
+  /* 页面标题在移动端减小 */
+  .admin-header .ant-typography {
+    font-size: 14px !important;
+  }
+
+  /* 表格在移动端启用横向滚动（已在页面中设置 scroll={{ x }}） */
+}

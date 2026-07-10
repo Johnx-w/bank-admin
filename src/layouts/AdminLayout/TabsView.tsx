@@ -1,4 +1,4 @@
-﻿import { Tabs } from "antd";
+import { Tabs } from "antd";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 

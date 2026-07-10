@@ -1,4 +1,4 @@
-﻿/**
+/**
  * 分页状态管理 Hook
  *
  * 管理 page/pageSize/total，提供 onChange、reset 操作和 skip 推导值。

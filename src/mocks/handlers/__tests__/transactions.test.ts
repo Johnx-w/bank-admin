@@ -1,4 +1,4 @@
-﻿/**
+/**
  * 交易 Mock Handler 单元测试
  *
  * 验证 mock 数据完整性和 handler 导出。

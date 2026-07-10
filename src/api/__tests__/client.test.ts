@@ -1,4 +1,4 @@
-﻿import { describe, it, expect, vi, beforeEach, beforeAll } from "vitest";
+import { describe, it, expect, vi, beforeEach, beforeAll } from "vitest";
 
 // 在所有 import 之前 mock axios
 const mockRequestInterceptor = { fulfilled: null as unknown, rejected: null as unknown };

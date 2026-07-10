@@ -1,4 +1,4 @@
-﻿import { Card, Typography, Spin } from "antd";
+import { Card, Typography, Spin } from "antd";
 
 interface StatCardProps {
   title: string;

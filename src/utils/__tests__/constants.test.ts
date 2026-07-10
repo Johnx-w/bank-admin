@@ -1,4 +1,4 @@
-﻿import { describe, it, expect } from "vitest";
+import { describe, it, expect } from "vitest";
 import { DEFAULT_PAGE_SIZE, PAGE_SIZE_OPTIONS, TOKEN_KEY,
   USER_STATUS_OPTIONS, TRANSACTION_STATUS_OPTIONS, PRIORITY_OPTIONS, CURRENCY_SYMBOL } from "../constants";
 

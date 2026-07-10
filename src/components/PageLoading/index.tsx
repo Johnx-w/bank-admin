@@ -1,4 +1,4 @@
-﻿import { Spin } from "antd";
+import { Spin } from "antd";
 
 interface PageLoadingProps {
   /** 加载提示文本 */

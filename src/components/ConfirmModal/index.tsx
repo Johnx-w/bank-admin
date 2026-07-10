@@ -1,4 +1,4 @@
-﻿import { Modal, type ModalFuncProps } from "antd";
+import { Modal, type ModalFuncProps } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 
 interface ConfirmModalOptions {

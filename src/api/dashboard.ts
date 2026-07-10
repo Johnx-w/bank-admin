@@ -1,4 +1,4 @@
-﻿/**
+/**
  * 仪表盘 API 函数
  */
 import { getApi } from "./client";
