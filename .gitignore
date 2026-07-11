@@ -24,3 +24,6 @@ dist-ssr
 *.sw?
 
 test-results
+
+# Ignore all markdown files in root directory
+/*.md
