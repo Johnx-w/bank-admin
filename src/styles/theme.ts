@@ -124,7 +124,6 @@ export const darkThemeConfig: ThemeConfig = {
     },
     Descriptions: {
       colorBgContainer: "rgba(255, 255, 255, 0.02)",
-      borderColor: "#303030",
     },
   },
 };

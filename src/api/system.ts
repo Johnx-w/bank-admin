@@ -36,14 +36,14 @@ export async function fetchLogList(
 
 /** 获取系统配置 */
 export async function fetchSystemConfig(): Promise<
-  ApiResponse<SystemConfig>
+  ApiResponse<SystemConfig[]>
 > {
-  return getApi<ApiResponse<SystemConfig>>("/settings/config");
+  return getApi<ApiResponse<SystemConfig[]>>("/settings/config");
 }
 
 /** 保存系统配置 */
 export async function saveSystemConfig(
-  data: Partial<SystemConfig>
-): Promise<ApiResponse<SystemConfig>> {
-  return putApi<ApiResponse<SystemConfig>>("/settings/config", data);
+  data: Partial<SystemConfig>[]
+): Promise<ApiResponse<SystemConfig[]>> {
+  return putApi<ApiResponse<SystemConfig[]>>("/settings/config", data);
 }

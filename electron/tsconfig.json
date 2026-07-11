@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "CommonJS",
-    "moduleResolution": "node",
+    "module": "node16",
+    "moduleResolution": "node16",
     "outDir": ".",
     "rootDir": ".",
     "esModuleInterop": true,
@@ -13,5 +13,6 @@
     "declaration": false,
     "sourceMap": false
   },
-  "include": ["main.ts", "preload.ts"]
+  "include": ["main.ts", "preload.ts"],
+  "exclude": ["node_modules"]
 }

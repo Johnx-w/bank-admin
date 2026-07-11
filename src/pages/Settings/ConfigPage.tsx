@@ -62,7 +62,7 @@ export default function ConfigPage() {
         updatedAt: new Date().toISOString(),
         updatedBy: "当前用户",
       }));
-      await saveSystemConfig(updated as SystemConfig[]);
+      await saveSystemConfig(updated);
       message.success("系统配置已保存");
       loadConfig();
     } catch {

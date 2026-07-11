@@ -109,7 +109,7 @@ export default function ProfilePage() {
       label: "基本信息",
       children: (
         <>
-          <Divider orientation="left" style={{ marginTop: 0 }}>
+          <Divider titlePlacement="left" style={{ marginTop: 0 }}>
             个人信息
           </Divider>
 

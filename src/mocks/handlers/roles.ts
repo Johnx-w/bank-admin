@@ -9,7 +9,7 @@ import type { ApiResponse, PaginatedData } from "../../types/api";
 import type { Role, RoleFormData } from "../../types/role";
 
 const API_PREFIX = "/api";
-let roles = [...MOCK_ROLES];
+let roles: Role[] = [...MOCK_ROLES];
 
 export const roleHandlers = [
   /** GET /api/roles — 分页获取角色列表 */

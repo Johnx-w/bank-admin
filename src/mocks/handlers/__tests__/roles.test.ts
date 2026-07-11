@@ -4,8 +4,7 @@
  *
  * 规则依据：instructions.md 第 1-10 条测试规范
  */
-import { describe, it, expect, beforeAll } from "vitest";
-import { http } from "msw";
+import { describe, it, expect } from "vitest";
 
 // 由于 MSW handler 内部使用模块级变量（闭包状态），
 // 这里测试 handler 函数的请求/响应匹配逻辑。

@@ -6,7 +6,7 @@
  * 规则依据：
  *   error-handling、js-early-exit、rendering-conditional-render、rerender-memo
  */
-import { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Button,
   Space,
@@ -31,8 +31,8 @@ import { confirmAction } from "../../components/ConfirmModal";
 import { usePagination } from "../../hooks/usePagination";
 import { formatDate } from "../../utils/format";
 import type { Role, RoleFormData, PermissionNode } from "../../types/role";
-import { fetchRoleList, fetchRoleById, createRole, updateRole, deleteRole } from "../../api/roles";
-import { postApi, getApi } from "../../api/client";
+import { fetchRoleList, createRole, updateRole, deleteRole } from "../../api/roles";
+import { getApi } from "../../api/client";
 import type { ApiResponse } from "../../types/api";
 
 /** 将 MOCK_PERMISSIONS 记录列表转为 Tree 节点 */
@@ -231,11 +231,11 @@ export default function RolesPage() {
   ];
 
   /** 权限树节点选中处理 */
-  const handleTreeCheck = useCallback((checked: string[] | { checked: string[]; halfChecked: string[] }) => {
+  const handleTreeCheck = useCallback((checked: React.Key[] | { checked: React.Key[]; halfChecked: React.Key[] }) => {
     if (Array.isArray(checked)) {
-      setCheckedKeys(checked);
+      setCheckedKeys(checked as string[]);
     } else {
-      setCheckedKeys(checked.checked);
+      setCheckedKeys(checked.checked as string[]);
     }
   }, []);
 

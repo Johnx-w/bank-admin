@@ -12,7 +12,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "electron:build-main": "cd electron && npx tsc -p tsconfig.json",
-    "electron:dev": "concurrently -k \"vite\" \"wait-on http://localhost:5173 && npx tsx electron/main.ts\"",
+    "electron:dev": "concurrently -k \"vite\" \"wait-on http://localhost:5173 && npm run electron:build-main && electron .\"",
     "electron:build": "npm run electron:build-main && vite build && electron-builder",
     "electron:preview": "npm run electron:build-main && vite build && electron ."
   },

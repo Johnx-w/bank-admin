@@ -5,6 +5,7 @@
  */
 import { http, HttpResponse, delay } from "msw";
 import { MOCK_ACCOUNTS } from "../data/accounts";
+import type { MockAccount } from "../data/accounts";
 import type { ApiResponse, PaginatedData } from "../../types/api";
 
 const API_PREFIX = "/api";
@@ -17,10 +18,10 @@ interface AccountDetailResponse {
   accountNo: string;
   holderName: string;
   holderId: string;
-  type: string;
+  type: "savings" | "checking" | "credit";
   currency: string;
   balance: number;
-  status: string;
+  status: "active" | "frozen" | "closed";
   openDate: string;
   freezeReason?: string;
   createdAt: string;
@@ -28,7 +29,7 @@ interface AccountDetailResponse {
   balanceRecords: Array<{
     id: string;
     date: string;
-    type: string;
+    type: "income" | "expense";
     amount: number;
     balanceAfter: number;
     description: string;
@@ -100,7 +101,7 @@ export const accountHandlers = [
       accountNo: "6222" + String(Math.floor(Math.random() * 90000000) + 10000000),
       holderName: body.holderName,
       holderId: body.holderId,
-      type: body.type,
+      type: body.type as "savings" | "checking" | "credit",
       currency: body.currency,
       balance: body.initialDeposit || 0,
       status: "active",
@@ -121,8 +122,8 @@ export const accountHandlers = [
         : [],
     };
 
-    accounts.unshift(newAccount);
-    return HttpResponse.json<ApiResponse<Record<string, unknown>>>(
+    accounts.unshift(newAccount as MockAccount);
+    return HttpResponse.json<ApiResponse<AccountDetailResponse>>(
       { code: 0, message: "开户成功", data: newAccount },
       { status: 201 }
     );
@@ -138,14 +139,14 @@ export const accountHandlers = [
         { status: 404 }
       );
     }
-    const body = (await request.json()) as { status: string };
+    const body = (await request.json()) as { status: "active" | "frozen" | "closed" };
     accounts[idx] = {
       ...accounts[idx],
       status: body.status,
       freezeReason: body.status === "frozen" ? "人工冻结" : undefined,
       updatedAt: new Date().toISOString(),
     };
-    return HttpResponse.json<ApiResponse<Record<string, unknown>>>(
+    return HttpResponse.json<ApiResponse<MockAccount>>(
       { code: 0, message: body.status === "frozen" ? "账户已冻结" : "账户已解冻", data: accounts[idx] },
       { status: 200 }
     );

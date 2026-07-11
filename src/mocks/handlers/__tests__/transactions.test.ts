@@ -25,7 +25,7 @@ describe("MOCK_TRANSACTIONS", () => {
 
   it("覆盖所有交易状态", () => {
     const statuses = new Set(MOCK_TRANSACTIONS.map((tx) => tx.status));
-    for (const s of ["pending", "approved", "rejected", "cancelled"]) {
+    for (const s of ["pending", "approved", "rejected", "cancelled"] as const) {
       expect(statuses.has(s)).toBe(true);
     }
   });

@@ -10,7 +10,7 @@
  *   rerender-memo（回调记忆化）
  */
 import { useState, useEffect, useCallback } from "react";
-import { Button, Space, Tag, Drawer, Descriptions, Spin, Typography, Select, Input } from "antd";
+import { Button, Space, Tag, Drawer, Descriptions, Spin, Typography, Input } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { ReloadOutlined, EyeOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import { ProTable } from "../../components/ProTable";
@@ -55,9 +55,6 @@ export default function TransactionsPage() {
   const [selectedTx, setSelectedTx] = useState<Transaction | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [detailError, setDetailError] = useState("");
-
-  // 选中行（用于批量审核）
-  const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
 
   /** 获取交易列表 */
   const loadTransactions = useCallback(async () => {

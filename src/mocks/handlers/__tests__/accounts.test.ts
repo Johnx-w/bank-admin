@@ -27,14 +27,14 @@ describe("MOCK_ACCOUNTS", () => {
 
   it("覆盖所有账户状态", () => {
     const statuses = new Set(MOCK_ACCOUNTS.map((a) => a.status));
-    for (const s of ["active", "frozen", "closed"]) {
+    for (const s of ["active", "frozen", "closed"] as const) {
       expect(statuses.has(s)).toBe(true);
     }
   });
 
   it("覆盖所有账户类型", () => {
     const types = new Set(MOCK_ACCOUNTS.map((a) => a.type));
-    for (const t of ["savings", "checking", "credit"]) {
+    for (const t of ["savings", "checking", "credit"] as const) {
       expect(types.has(t)).toBe(true);
     }
   });
