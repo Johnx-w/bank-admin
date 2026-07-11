@@ -23,11 +23,4 @@ dist-ssr
 *.sln
 *.sw?
 
-# Electron build output
-release/
-
-# Electron compiled main process (tsc output)
-electron/main.js
-electron/preload.js
-
 test-results

@@ -1,0 +1,20 @@
+[33mc1631c5[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m 纯web端口修复
+[33m0424766[m[33m ([m[1;31morigin/main[m[33m)[m TS构建修复
+[33m8fb5544[m 删除远程文件
+[33mf9974ef[m ignore
+[33m56e1484[m 开发日志
+[33me4ded79[m E2E 测试
+[33mae5cf6f[m SKILL
+[33m4da1c3d[m ci: 添加 Docker 部署配置
+[33m51b534a[m ci: 修复 CI 工作流配置
+[33m8e66eef[m ci: 添加 GitHub Actions 流水线 (lint + test + build)
+[33m8a914f9[m chore: 清理文档，添加开发日志和背景图
+[33m0d4840d[m fix: 修复 ErrorBoundary 布局和 Reports 页面
+[33m25ecdeb[m chore: 优化 Electron 配置并统一代码风格
+[33m13cd2cd[m feat: 添加 Profile、Reports、Roles 和 Settings 页面
+[33m5ba8d83[m feat: 补全 API 模块和表单组件
+[33m34c4349[m test: 添加 Mock 处理函数测试
+[33mc969779[m feat: 实现核心页面、组件和 Mock 服务
+[33m7058edc[m feat: 添加状态管理、API 客户端和 Hooks
+[33m786ca36[m test: 添加工具函数单元测试
+[33mbcb37bb[m feat: 初始化项目脚手架 (Vite + React + TypeScript)
