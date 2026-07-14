@@ -1,4 +1,4 @@
-import { BrowserRouter } from "react-router-dom";
+import { HashRouter } from "react-router-dom";
 import { ConfigProvider, theme as antdTheme } from "antd";
 import zhCN from "antd/locale/zh_CN";
 import { ErrorBoundary } from "./components/ErrorBoundary";
@@ -26,9 +26,9 @@ export default function App() {
   return (
     <ErrorBoundary>
       <ConfigProvider theme={mergedTheme} locale={zhCN}>
-        <BrowserRouter>
+        <HashRouter>
           <AppRouter />
-        </BrowserRouter>
+        </HashRouter>
       </ConfigProvider>
     </ErrorBoundary>
   );
