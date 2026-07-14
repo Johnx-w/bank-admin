@@ -9,6 +9,13 @@ release
 .git
 .gitignore
 
+# 测试 & 开发
+e2e
+test-results
+playwright-report
+*.md
+
+
 # IDE
 .vscode
 .idea
