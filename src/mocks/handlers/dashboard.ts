@@ -8,7 +8,7 @@ import { MOCK_DASHBOARD } from "../data/dashboard";
 import type { ApiResponse } from "../../types/api";
 import type { DashboardData } from "../../types/dashboard";
 
-const API_PREFIX = "/api";
+import { API_BASE_URL as API_PREFIX } from "../../utils/constants";
 
 export const dashboardHandlers = [
   /** GET /api/dashboard — 获取仪表盘数据 */

@@ -14,6 +14,7 @@ interface AuthLayoutProps {
  * 规则依据：rendering-conditional-render（无标题时只展示子组件）
  */
 export function AuthLayout({ children, title = "银行后台管理系统" }: AuthLayoutProps) {
+  const bgUrl = `${import.meta.env.BASE_URL}images/bg.jpg`;
   return (
     <div
       style={{
@@ -22,7 +23,7 @@ export function AuthLayout({ children, title = "银行后台管理系统" }: Aut
         justifyContent: "center",
         alignItems: "center",
         position: "relative",
-        background: "url(/images/bg.jpg) center/cover no-repeat",
+        background: `url(${bgUrl}) center/cover no-repeat`,
       }}
     >
       {/* 半透明遮罩层 */}

@@ -8,7 +8,7 @@ import { MOCK_ACCOUNTS } from "../data/accounts";
 import type { MockAccount } from "../data/accounts";
 import type { ApiResponse, PaginatedData } from "../../types/api";
 
-const API_PREFIX = "/api";
+import { API_BASE_URL as API_PREFIX } from "../../utils/constants";
 let accounts = [...MOCK_ACCOUNTS];
 let nextId = 10;
 

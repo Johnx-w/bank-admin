@@ -8,7 +8,7 @@ import { MOCK_TRANSACTIONS } from "../data/transactions";
 import type { ApiResponse, PaginatedData } from "../../types/api";
 import type { Transaction } from "../../types/transaction";
 
-const API_PREFIX = "/api";
+import { API_BASE_URL as API_PREFIX } from "../../utils/constants";
 let transactions = [...MOCK_TRANSACTIONS];
 
 export const transactionHandlers = [

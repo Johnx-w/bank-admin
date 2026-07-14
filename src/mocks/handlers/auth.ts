@@ -8,7 +8,7 @@ import { MOCK_USERS, MOCK_TOKEN } from "../data/auth";
 import type { ApiResponse } from "../../types/api";
 import type { User } from "../../types/user";
 
-const API_PREFIX = "/api";
+import { API_BASE_URL as API_PREFIX } from "../../utils/constants";
 
 export const authHandlers = [
   /** POST /api/login — 登录验证 */

@@ -59,5 +59,7 @@ export const PRIORITY_OPTIONS = [
 ];
 
 // ---- API 基础路径 ----
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+// 开发环境: /api，生产环境(GitHub Pages): /bank-admin/api
+// 确保 API 请求落在 Service Worker 作用域内，MSW 才能拦截
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || `${import.meta.env.BASE_URL}api`;
 export const REQUEST_TIMEOUT = 30000;  // 毫秒

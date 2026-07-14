@@ -9,7 +9,7 @@ import { MOCK_USER_LIST } from "../data/users";
 import type { ApiResponse, PaginatedData } from "../../types/api";
 import type { User, UserFormData } from "../../types/user";
 
-const API_PREFIX = "/api";
+import { API_BASE_URL as API_PREFIX } from "../../utils/constants";
 let users = [...MOCK_USER_LIST];
 let nextId = 100;
 

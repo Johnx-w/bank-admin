@@ -25,11 +25,14 @@ export const handlers = [
 const worker = setupWorker(...handlers);
 
 export async function startWorker(): Promise<void> {
-  if (import.meta.env.PROD) return;
   try {
     await worker.start({
       onUnhandledRequest: "bypass",
       quiet: true,
+      // 指定 Service Worker 文件路径，适配 GitHub Pages 的 base 路径
+      serviceWorker: {
+        url: `${import.meta.env.BASE_URL}mockServiceWorker.js`,
+      },
     });
     console.log("[MSW] Mock Service Worker started");
   } catch (error) {

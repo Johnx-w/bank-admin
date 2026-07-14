@@ -29,7 +29,7 @@ export const MOCK_USERS: MockAuthUser[] = [
   {
     id: "u002",
     username: "operator",
-    password: "oper1234",
+    password: "oper123",
     nickname: "业务操作员",
     email: "oper@bank.com",
     phone: "13900139000",

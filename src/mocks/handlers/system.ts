@@ -7,7 +7,7 @@ import { http, HttpResponse, delay } from "msw";
 import type { ApiResponse, PaginatedData } from "../../types/api";
 import type { OperationLog, SystemConfig } from "../../types/system";
 
-const API_PREFIX = "/api";
+import { API_BASE_URL as API_PREFIX } from "../../utils/constants";
 
 /** Mock 操作日志 */
 const MOCK_LOGS: OperationLog[] = [

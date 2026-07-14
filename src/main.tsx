@@ -12,10 +12,8 @@ import "./styles/index.css";
  * 无网络拦截时页面可以正常展示但数据为空。
  */
 async function bootstrap() {
-  // 仅在开发环境启动 MSW
-  if (import.meta.env.DEV) {
-    await startWorker();
-  }
+  // 在所有环境启动 MSW，确保 Mock API 在本地和生产(GitHub Pages)均可用
+  await startWorker();
 
   const root = document.getElementById("root");
   if (!root) throw new Error("Root element not found");

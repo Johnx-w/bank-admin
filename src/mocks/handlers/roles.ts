@@ -8,7 +8,7 @@ import { MOCK_ROLES, MOCK_PERMISSIONS } from "../data/users";
 import type { ApiResponse, PaginatedData } from "../../types/api";
 import type { Role, RoleFormData } from "../../types/role";
 
-const API_PREFIX = "/api";
+import { API_BASE_URL as API_PREFIX } from "../../utils/constants";
 let roles: Role[] = [...MOCK_ROLES];
 
 export const roleHandlers = [
