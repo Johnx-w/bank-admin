@@ -59,6 +59,7 @@ export const accountHandlers = [
 
     const total = filtered.length;
     const start = (page - 1) * pageSize;
+    // 故意解构剥离 balanceRecords，不在列表中返回
     const list = filtered.slice(start, start + pageSize).map(
       ({ balanceRecords, ...rest }) => rest
     );

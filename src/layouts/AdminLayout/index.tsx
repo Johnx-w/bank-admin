@@ -55,6 +55,9 @@ export function AdminLayout() {
         />
         <TabsView />
         <Content className="layout-content">
+          {/* <Outlet /> 是 React Router 的占位组件，路由切换时会渲染对应的页面组件。
+          这里用 ErrorBoundary 包裹，
+          防止单个页面崩溃导致整个布局白屏——即使某个页面报错，侧边栏、顶栏和标签页仍然可用 */}
           <ErrorBoundary>
             <Outlet />
           </ErrorBoundary>

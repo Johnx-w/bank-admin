@@ -1,0 +1,1 @@
+{"plugins":["typescript","react","import"],"rules":{"react/rules-of-hooks":"error","react/exhaustive-deps":"warn"}}
