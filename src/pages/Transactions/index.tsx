@@ -53,6 +53,7 @@ export default function TransactionsPage() {
   const [minAmount, setMinAmount] = useState("");
   const [maxAmount, setMaxAmount] = useState("");
   const pagination = usePagination();
+  const { page, pageSize, total, setTotal, setPage: paginationSetPage, onChange } = pagination;
   const setAutoCounts = useTodoStore((s) => s.setAutoCounts);
 
   // 详情抽屉
@@ -67,8 +68,8 @@ export default function TransactionsPage() {
     setError("");
     try {
       const res = await fetchTransactionList({
-        page: pagination.page,
-        pageSize: pagination.pageSize,
+        page,
+        pageSize,
         status: statusFilter || undefined,
         direction: directionFilter || undefined,
         keyword: keyword || undefined,
@@ -76,15 +77,16 @@ export default function TransactionsPage() {
         maxAmount: maxAmount || undefined,
       });
       setTransactions(res.data.list);
-      pagination.setTotal(res.data.total);
+      setTotal(res.data.total);
     } catch {
       setError("数据加载失败，请检查网络连接后重试");
     } finally {
       setLoading(false);
     }
   }, [
-    pagination.page,
-    pagination.pageSize,
+    page,
+    pageSize,
+    setTotal,
     statusFilter,
     directionFilter,
     keyword,
@@ -107,9 +109,9 @@ export default function TransactionsPage() {
   }, [setAutoCounts]);
 
   const handleSearch = useCallback((value: string) => {
-    pagination.setPage(1);
+    paginationSetPage(1);
     setKeyword(value);
-  }, []);
+  }, [paginationSetPage]);
 
   /** 查看详情 */
   const handleViewDetail = useCallback(async (tx: TransactionListRow) => {
@@ -284,7 +286,7 @@ export default function TransactionsPage() {
             width: 120,
             value: statusFilter,
             onChange: (val: string) => {
-              pagination.setPage(1);
+              paginationSetPage(1);
               setStatusFilter(val);
             },
             options: TRANSACTION_STATUS_OPTIONS.map((o) => ({
@@ -298,7 +300,7 @@ export default function TransactionsPage() {
             width: 110,
             value: directionFilter,
             onChange: (val: string) => {
-              pagination.setPage(1);
+              paginationSetPage(1);
               setDirectionFilter(val);
             },
             options: TRANSACTION_DIRECTION_OPTIONS.map((o) => ({
@@ -339,10 +341,10 @@ export default function TransactionsPage() {
           rowKey="id"
           emptyText="暂无交易数据"
           pagination={{
-            current: pagination.page,
-            pageSize: pagination.pageSize,
-            total: pagination.total,
-            onChange: pagination.onChange,
+            current: page,
+            pageSize,
+            total,
+            onChange,
             showSizeChanger: true,
             showTotal: (total: number) => "共 " + total + " 条",
           }}
