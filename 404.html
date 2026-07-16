@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>银行后台管理系统</title>
+  <script>
+    // GitHub Pages SPA 路由回退：将 404 页面重定向到 index.html，
+    // 保留原始路径作为查询参数，由前端路由接管
+    const path = location.pathname.replace(/\/bank-admin/, '') || '/';
+    const search = location.search || '';
+    location.replace('/bank-admin/?redirect=' + encodeURIComponent(path + search));
+  </script>
+</head>
+<body></body>
+</html>
