@@ -81,3 +81,53 @@ export function maskAccount(accountNo: string): string {
   if (accountNo.length <= 4) return accountNo;
   return '****' + accountNo.slice(-4);
 }
+
+/** 星期映射 */
+const WEEKDAY_NAMES = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+
+/**
+ * 智能格式化截止日期
+ *
+ * 规则：
+ *   - 今天截止 → "今天 HH:mm"
+ *   - 明天截止 → "明天 HH:mm"
+ *   - 本周截止 → "本周X HH:mm"
+ *   - 其他     → "MM-DD HH:mm"
+ *
+ * @param dateStr 日期字符串，支持 "YYYY-MM-DD" 或 "YYYY-MM-DD HH:mm"
+ * @example formatSmartDeadline('2026-07-16 18:00') // => '今天 18:00'
+ * @example formatSmartDeadline('2026-07-18 10:00') // => '本周六 10:00'
+ */
+export function formatSmartDeadline(dateStr: string): string {
+  if (!dateStr) return '-';
+  try {
+    // 兼容 "YYYY-MM-DD" 和 "YYYY-MM-DD HH:mm" 两种格式
+    const normalized = dateStr.includes('T')
+      ? dateStr
+      : dateStr.replace(' ', 'T') + (dateStr.includes(':') ? '' : 'T00:00');
+    const d = new Date(normalized);
+    if (isNaN(d.getTime())) return dateStr;
+
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const target = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    const diffDays = Math.round((target.getTime() - today.getTime()) / 86400000);
+
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const time = `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+
+    if (diffDays === 0) return `今天 ${time}`;
+    if (diffDays === 1) return `明天 ${time}`;
+
+    // 本周：周一为本周第一天，周日为最后一天
+    const dayOfWeek = now.getDay(); // 0=周日
+    const daysUntilSunday = dayOfWeek === 0 ? 0 : 7 - dayOfWeek;
+    if (diffDays > 1 && diffDays <= daysUntilSunday) {
+      return `本周${WEEKDAY_NAMES[d.getDay()]} ${time}`;
+    }
+
+    return `${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${time}`;
+  } catch {
+    return dateStr;
+  }
+}

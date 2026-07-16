@@ -26,6 +26,8 @@ export interface TodoItem {
   priority: 'high' | 'medium' | 'low';
   deadline: string;
   module: string;             // 所属模块名
+  completed: boolean;         // 是否已完成
+  completedAt?: string;       // 完成时间（ISO 字符串）
 }
 
 /** Dashboard 完整数据 */

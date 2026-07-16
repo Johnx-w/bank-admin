@@ -9,7 +9,9 @@ import type { ApiResponse, PaginatedData } from "../../types/api";
 import type { Transaction } from "../../types/transaction";
 
 import { API_BASE_URL as API_PREFIX } from "../../utils/constants";
-let transactions = [...MOCK_TRANSACTIONS];
+
+/** 可变交易数据副本（审核操作会修改此数组） */
+export let transactions = [...MOCK_TRANSACTIONS];
 
 export const transactionHandlers = [
   /** GET /api/transactions — 分页获取交易列表 */

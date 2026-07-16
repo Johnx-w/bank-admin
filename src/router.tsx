@@ -12,6 +12,7 @@ import LogsPage from "./pages/Settings/LogsPage";
 import ConfigPage from "./pages/Settings/ConfigPage";
 import ProfilePage from "./pages/Profile";
 import ReportsPage from "./pages/Reports";
+import CompletedTodosPage from "./pages/CompletedTodos";
 import NotFoundPage from "./pages/NotFound";
 import { useAuthStore } from "./stores/authStore";
 
@@ -60,6 +61,7 @@ export default function AppRouter() {
         <Route path="/settings/logs" element={<LogsPage />} />
         <Route path="/settings/config" element={<ConfigPage />} />
         <Route path="/reports" element={<ReportsPage />} />
+        <Route path="/completed-todos" element={<CompletedTodosPage />} />
         <Route path="/profile" element={<ProfilePage />} />
       </Route>
 

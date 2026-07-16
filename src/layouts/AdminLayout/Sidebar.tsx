@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import { Layout, Menu, Typography } from "antd";
+import { Layout, Menu, Typography, Badge } from "antd";
 import type { MenuProps } from "antd";
 import {
   DashboardOutlined,
@@ -9,8 +9,10 @@ import {
   CreditCardOutlined,
   SettingOutlined,
   BarChartOutlined,
+  CheckCircleOutlined,
 } from "@ant-design/icons";
 import { useAppStore } from "../../stores/appStore";
+import { useTodoStore } from "../../stores/todoStore";
 
 const { Sider } = Layout;
 
@@ -37,11 +39,47 @@ const MENU_ITEMS: MenuProps["items"] = [
  * 侧边栏菜单内容（纯菜单，不含 Sider 外壳）
  *
  * 提取为独立组件，供桌面端 Sider 和移动端 Drawer 复用。
+ * 菜单项包含静态路由 + 动态"已完成待办"（带 Badge 计数）。
  */
 export function SidebarMenu() {
   const navigate = useNavigate();
   const location = useLocation();
   const sidebarCollapsed = useAppStore((s) => s.sidebarCollapsed);
+  const completedCount = useTodoStore((s) => {
+    // 仅统计上次查看后新完成的待办（Badge 已读机制）
+    if (!s.lastViewedCompletedAt) {
+      return s.customTodos.filter((t) => t.completed).length;
+    }
+    return s.customTodos.filter(
+      (t) => t.completed && t.completedAt && t.completedAt > s.lastViewedCompletedAt!,
+    ).length;
+  });
+
+  /** 动态构建菜单项（静态项 + 已完成待办） */
+  const menuItems: MenuProps["items"] = [
+    ...(MENU_ITEMS ?? []),
+    {
+      key: "/completed-todos",
+      icon: <CheckCircleOutlined />,
+      label: sidebarCollapsed ? (
+        <Badge count={completedCount} size="small" offset={[4, 0]}>
+          <span style={{ color: "rgba(255,255,255,0.65)" }}>完成</span>
+        </Badge>
+      ) : (
+        <span>
+          已完成待办
+          {completedCount > 0 && (
+            <Badge
+              count={completedCount}
+              size="small"
+              style={{ marginLeft: 8 }}
+              styles={{ root: { boxShadow: "none" } }}
+            />
+          )}
+        </span>
+      ),
+    },
+  ];
 
   const handleMenuClick: MenuProps["onClick"] = ({ key }) => {
     navigate(key);
@@ -63,7 +101,7 @@ export function SidebarMenu() {
         mode="inline"
         selectedKeys={[location.pathname]}
         defaultOpenKeys={["/settings"]}
-        items={MENU_ITEMS}
+        items={menuItems}
         onClick={handleMenuClick}
       />
     </>

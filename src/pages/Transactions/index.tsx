@@ -26,6 +26,10 @@ import {
 } from "../../utils/constants";
 import type { Transaction, TransactionStatus, TransactionDirection } from "../../types/transaction";
 import { fetchTransactionList, fetchTransactionById, auditTransactions } from "../../api/transactions";
+import { getApi } from "../../api/client";
+import { useTodoStore } from "../../stores/todoStore";
+import type { ApiResponse } from "../../types/api";
+import type { DashboardData } from "../../types/dashboard";
 
 interface TransactionListRow {
   id: string;
@@ -49,6 +53,7 @@ export default function TransactionsPage() {
   const [minAmount, setMinAmount] = useState("");
   const [maxAmount, setMaxAmount] = useState("");
   const pagination = usePagination();
+  const setAutoCounts = useTodoStore((s) => s.setAutoCounts);
 
   // 详情抽屉
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -91,6 +96,16 @@ export default function TransactionsPage() {
     loadTransactions();
   }, [loadTransactions]);
 
+  /** 刷新自动待办计数（审核后调用） */
+  const refreshTodoCounts = useCallback(async () => {
+    try {
+      const res = await getApi<ApiResponse<DashboardData>>("/dashboard");
+      setAutoCounts(res.data.stats.pendingAudit, res.data.stats.anomalyCount);
+    } catch {
+      // 静默失败，不影响主流程
+    }
+  }, [setAutoCounts]);
+
   const handleSearch = useCallback((value: string) => {
     pagination.setPage(1);
     setKeyword(value);
@@ -127,11 +142,12 @@ export default function TransactionsPage() {
             remark: "",
           });
           loadTransactions();
+          refreshTodoCounts();
           setDrawerOpen(false);
         },
       });
     },
-    [loadTransactions]
+    [loadTransactions, refreshTodoCounts]
   );
 
   /** 审核驳回 */
@@ -149,11 +165,12 @@ export default function TransactionsPage() {
             remark: "审核驳回",
           });
           loadTransactions();
+          refreshTodoCounts();
           setDrawerOpen(false);
         },
       });
     },
-    [loadTransactions]
+    [loadTransactions, refreshTodoCounts]
   );
 
   /** 表格列定义 */

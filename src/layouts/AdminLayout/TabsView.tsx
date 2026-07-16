@@ -18,6 +18,7 @@ const TAB_TITLE: Record<string, string> = {
   "/settings/config": "系统配置",
   "/reports": "报表中心",
   "/profile": "个人中心",
+  "/completed-todos": "已完成待办",
 };
 
 /**
