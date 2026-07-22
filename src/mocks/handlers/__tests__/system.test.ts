@@ -6,8 +6,8 @@ import { describe, it, expect } from "vitest";
 import { systemHandlers } from "../system";
 
 describe("systemHandlers", () => {
-  it("应包含 3 个 handler（GET logs, GET config, PUT config）", () => {
-    expect(systemHandlers).toHaveLength(3);
+  it("应包含 4 个 handler（PING, GET logs, GET config, PUT config）", () => {
+    expect(systemHandlers).toHaveLength(4);
   });
 
   it("每个 handler 的 info.method 和 info.path 应正确", () => {

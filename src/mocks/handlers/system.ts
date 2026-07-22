@@ -142,6 +142,11 @@ const MOCK_CONFIG: SystemConfig[] = [
 ];
 
 export const systemHandlers = [
+  /** HEAD|GET /api/ping — MSW 心跳保活，防止浏览器休眠 Service Worker */
+  http.all(`${API_PREFIX}/ping`, async () => {
+    return HttpResponse.json({ code: 0, message: "pong", data: null }, { status: 200 });
+  }),
+
   /** GET /api/settings/logs — 分页获取操作日志 */
   http.get(`${API_PREFIX}/settings/logs`, async ({ request }) => {
     await delay(200);
